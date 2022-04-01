@@ -1,72 +1,127 @@
-function add(x, y){
-    return x + y;
+const calculate = (n1, operator, n2) => {
+    const firstNum = parseFloat(n1)
+    const secondNum = parseFloat(n2)
+    if (operator === 'add') return firstNum + secondNum
+    if (operator === 'subtract') return firstNum - secondNum
+    if (operator === 'multiply') return firstNum * secondNum
+    if (operator === 'divide') return firstNum / secondNum
 }
 
-function subtract(x, y){
-    return x - y;
+const getKeyType = key => {
+    const { action } = key.dataset
+    if (!action) return 'number'
+    if (
+        action === 'add' ||
+        action === 'subtract' ||
+        action === 'multiply' ||
+        action === 'divide'
+    ) return 'operator'
+    // For everything else, return the action
+    return action
 }
 
-function multiply(x, y){
-    return x * y;
-}
+const createResultString = (key, displayedNum, state) => {
+    const keyContent = key.textContent
+    const keyType = getKeyType(key)
+    const {
+        firstValue,
+        operator,
+        modValue,
+        previousKeyType
+    } = state
 
-function divide(x, y){
-    return x / y;
-}
-
-let currentOp = -1;
-let operand1;
- //function that display value
- function dis(val)
- {
-    document.getElementById("result").value+=val;
-    
- }
-
- function operate(op, operand2){
-    let result;
-    switch(op){
-        case '+':
-            result = add(operand1, operand2);
-            break;
-        case '-':
-            result = subtract(operand1, operand2);
-            break;
-        case '*':
-            result = multiply(operand1, operand2);
-            break;
-        case '/':
-            result = divide(operand1, operand2);
-            break;
-        default:
-            console.log('error');
+    if (keyType === 'number') {
+        return displayedNum === '0' ||
+            previousKeyType === 'operator' ||
+            previousKeyType === 'calculate'
+            ? keyContent
+            : displayedNum + keyContent
     }
-    currentOp = -1;
-    return result;
+
+    if (keyType === 'decimal') {
+        if (!displayedNum.includes('.')) return displayedNum + '.'
+        if (previousKeyType === 'operator' || previousKeyType === 'calculate') return '0.'
+        return displayedNum
+    }
+
+    if (keyType === 'operator') {
+        return firstValue &&
+            operator &&
+            previousKeyType !== 'operator' &&
+            previousKeyType !== 'calculate'
+            ? calculate(firstValue, operator, displayedNum)
+            : displayedNum
+    }
+
+    if (keyType === 'clear') return 0
+
+    if (keyType === 'calculate') {
+        return firstValue
+            ? previousKeyType === 'calculate'
+                ? calculate(displayedNum, operator, modValue)
+                : calculate(firstValue, operator, displayedNum)
+            : displayedNum
+    }
 }
 
- function setOp(op){
-    operand1 = document.getElementById("result").value;
-    if(op != -1){
-        operand1 = operate(currentOp, val);
+const updateCalculatorState = (key, calculator, calculatedValue, displayedNum) => {
+    const keyType = getKeyType(key)
+    const {
+        firstValue,
+        operator,
+        modValue,
+        previousKeyType
+    } = calculator.dataset
+
+    calculator.dataset.previousKeyType = keyType
+
+    if (keyType === 'operator') {
+        calculator.dataset.operator = key.dataset.action
+        calculator.dataset.firstValue = firstValue &&
+            operator &&
+            previousKeyType !== 'operator' &&
+            previousKeyType !== 'calculate'
+            ? calculatedValue
+            : displayedNum
     }
-    currentOp = op;
-    console.log(operand1);
-    console.log(currentOp);
-    document.getElementById("result").value = op;
- }
- //function that evaluates the digit and return result
- function solve()
- {
-     let prev = document.getElementById("result").value;
-     let y = operate(currentOp, prev);
-     document.getElementById("result").value = y
- }
-   
- //function that clear the display
- function clr()
- {
-     document.getElementById("result").value = "";
-    currentOp = "";
-    operand1 = "";
- }
+
+    if (keyType === 'calculate') {
+        calculator.dataset.modValue = firstValue && previousKeyType === 'calculate'
+            ? modValue
+            : displayedNum
+    }
+
+    if (keyType === 'clear' && key.textContent === 'AC') {
+        calculator.dataset.firstValue = ''
+        calculator.dataset.modValue = ''
+        calculator.dataset.operator = ''
+        calculator.dataset.previousKeyType = ''
+    }
+}
+
+const updateVisualState = (key, calculator) => {
+    const keyType = getKeyType(key)
+    Array.from(key.parentNode.children).forEach(k => k.classList.remove('is-depressed'))
+
+    if (keyType === 'operator') key.classList.add('is-depressed')
+    if (keyType === 'clear' && key.textContent !== 'AC') key.textContent = 'AC'
+    if (keyType !== 'clear') {
+        const clearButton = calculator.querySelector('[data-action=clear]')
+        clearButton.textContent = 'CE'
+    }
+}
+
+const calculator = document.querySelector('.calculator')
+const display = calculator.querySelector('.calculator__display')
+const keys = calculator.querySelector('.calculator__keys')
+
+keys.addEventListener('click', e => {
+    if (!e.target.matches('button')) return
+    const key = e.target
+    const displayedNum = display.textContent
+    const resultString = createResultString(key, displayedNum, calculator.dataset)
+
+    display.textContent = resultString
+    updateCalculatorState(key, calculator, resultString, displayedNum)
+    updateVisualState(key, calculator)
+})

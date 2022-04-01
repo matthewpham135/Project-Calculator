@@ -5,43 +5,34 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src="script.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
-    <div class = title >GeeksforGeeks Calculator</div>
-      <table border="1">
-         <tr>
-            <td colspan="3"><input type="text" id="result"/></td>
-            <!-- clr() function will call clr to clear all value -->
-            <td><input type="button" value="c" onclick="clr()"/> </td>
-         </tr>
-         <tr>
-            <!-- create button and assign value to each button -->
-            <!-- dis("1") will call function dis to display value -->
-            <td><input type="button" value="1" onclick="dis('1')"/> </td>
-            <td><input type="button" value="2" onclick="dis('2')"/> </td>
-            <td><input type="button" value="3" onclick="dis('3')"/> </td>
-            <td><input type="button" value="/" onclick="setOp('/')"/> </td>
-         </tr>
-         <tr>
-            <td><input type="button" value="4" onclick="dis('4')"/> </td>
-            <td><input type="button" value="5" onclick="dis('5')"/> </td>
-            <td><input type="button" value="6" onclick="dis('6')"/> </td>
-            <td><input type="button" value="-" onclick="setOp('-')"/> </td>
-         </tr>
-         <tr>
-            <td><input type="button" value="7" onclick="dis('7')"/> </td>
-            <td><input type="button" value="8" onclick="dis('8')"/> </td>
-            <td><input type="button" value="9" onclick="dis('9')"/> </td>
-            <td><input type="button" value="+" onclick="setOp('+')"/> </td>
-         </tr>
-         <tr>
-            <td><input type="button" value="." onclick="dis('.')"/> </td>
-            <td><input type="button" value="0" onclick="dis('0')"/> </td>
-            <!-- solve function call function solve to evaluate value -->
-            <td><input type="button" value="=" onclick="solve()"/> </td>
-            <td><input type="button" value="*" onclick="setOp('*')"/> </td>
-         </tr>
-      </table>
+   <div class="container">
+      <div class="calculator">
+        <div class="calculator__display">0</div>
+  
+        <div class="calculator__keys">
+          <button class="key--operator" data-action="add">+</button>
+          <button class="key--operator" data-action="subtract">-</button>
+          <button class="key--operator" data-action="multiply">&times;</button>
+          <button class="key--operator" data-action="divide">÷</button>
+          <button>7</button>
+          <button>8</button>
+          <button>9</button>
+          <button>4</button>
+          <button>5</button>
+          <button>6</button>
+          <button>1</button>
+          <button>2</button>
+          <button>3</button>
+          <button>0</button>
+          <button data-action="decimal">.</button>
+          <button data-action="clear">AC</button>
+          <button class="key--equal" data-action="calculate">=</button>
+        </div>
+      </div>
+    </div>
 </body>
 </html>
